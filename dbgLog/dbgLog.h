@@ -35,6 +35,7 @@
 // #define DBG_API MYMODULE_API // If you would rather define the modules API here you can, but otherwise stick to using the build.cs definition.
 
 
+
 /**
  *	This library is built on top of LLog - https://github.com/landelare/llog and adds some QOL features as well as implementing
  *	the actual macros and Builder pattern for logging (more on this later).
@@ -281,8 +282,13 @@ enum EDbgLogOutput : uint8
 
 
 
-
 #if KEEP_DBG_LOG
+
+
+#ifndef DBG_API
+#error "If you are seeing this error, please add the following line to the Build.cs file of the module which houses log folder - `PublicDefinitions.Add("DBG_API=MYMODULE_API");` (replacing MYMODULE_API with your own), also ensure the module has \"Slate\" as a dependency."
+#endif
+
 
 DBG_API DECLARE_LOG_CATEGORY_EXTERN(dbgLOG, Display, All);
 
@@ -433,7 +439,8 @@ namespace DBG::Log
 		 * @param MsgType What type of dialog should be shown
 		 * @param bOnlyUseThisLog If true we do not attempt to also log to the console or screen.
 		 */
-		ThisClass& LogToMessageDialog(const TFunction<void(EAppReturnType::Type UserResponse)>& Response,
+		ThisClass& LogToMessageDialog(
+			const TFunction<void(EAppReturnType::Type UserResponse)>& Response,
 			EAppMsgType::Type MsgType, bool bOnlyUseThisLog = false)
 		{
 			AppMessageResponse = Response;
@@ -449,7 +456,8 @@ namespace DBG::Log
 		 * @param bShouldShowEditorMessageLogImmediately If true we instantly spawn the editor message log window,
 		 * otherwise you need to manually check the window
 		 */
-		ThisClass& LogToEditorMessageLog(bool bShouldShowEditorMessageLogImmediately = false)
+		ThisClass& LogToEditorMessageLog(
+			bool bShouldShowEditorMessageLogImmediately = false)
 		{
 			bLogToEditorMessageLog = true;
 			bShowEditorMessageLogImmediately = bShouldShowEditorMessageLogImmediately;
@@ -465,163 +473,146 @@ namespace DBG::Log
 		ThisClass& LogDateAndTime(TStringView<TCHAR> Format) {bLogDateAndTime = true; DateTimeFormat = Format; return *this;}
 
 
-		ThisClass& DrawDebugCapsule(const UObject* WorldContextObject,
-			const FVector& Center,
-			float HalfHeight,
-			float Radius,
-			const FQuat& Rotation,
-			const FColor& Color,
-			bool bPersistentLines = false,
-			float LifeTime = -1.f,
-			uint8 DepthPriority = 0,
-			float Thickness = 0);
-
-		ThisClass& DrawDebugCone(const UObject* WorldContextObject,
-			const FVector& Origin,
-			const FVector& Direction,
-			float Length,
-			float AngleWidth,
-			float AngleHeight,
-			int32 NumSides,
-			const FColor& Color = FColor::Orange,
-			bool bPersistentLines = false,
-			float LifeTime = -1.f,
-			uint8 DepthPriority = 0,
-			float Thickness = 0);
-
-		ThisClass& DrawDebugCylinder(const UObject* WorldContextObject,
-			const FVector& Start,
-			const FVector& End,
-			float Radius,
-			int32 Segments,
-			const FColor& Color = FColor::Orange,
-			bool bPersistentLines = false,
-			float LifeTime = -1.f,
-			uint8 DepthPriority = 0,
-			float Thickness = 0);
-
-		ThisClass& DrawDebugDirectionalArrow(const UObject* WorldContextObject,
-			const FVector& LineStart,
-			const FVector& LineEnd,
-			float ArrowSize,
-			const FColor& Color = FColor::Orange,
-			bool bPersistentLines = false,
-			float LifeTime = -1.f,
-			uint8 DepthPriority = 0,
-			float Thickness = 0);
-
-		ThisClass& DrawDebugLine(const UObject* WorldContextObject,
-			const FVector& LineStart,
-			const FVector& LineEnd,
-			const FColor& Color = FColor::Orange,
-			bool bPersistentLines = false,
-			float LifeTime = -1.f,
+		ThisClass& DrawDebugCapsule(
+			const UObject* WorldContextObject, const FVector& Center,
+			float HalfHeight, float Radius,
+			const FQuat& Rotation, const FColor& Color,
+			bool bPersistentLines = false, float LifeTime = -1.f,
 			uint8 DepthPriority = 0, float Thickness = 0);
 
-		ThisClass& DrawDebugPoint(const UObject* WorldContextObject,
-			const FVector& Position,
-			float Size,
+		
+		ThisClass& DrawDebugCone(
+			const UObject* WorldContextObject, const FVector& Origin,
+			const FVector& Direction, float Length,
+			float AngleWidth, float AngleHeight,
+			int32 NumSides, const FColor& Color = FColor::Orange,
+			bool bPersistentLines = false, float LifeTime = -1.f,
+			uint8 DepthPriority = 0, float Thickness = 0);
+
+		
+		ThisClass& DrawDebugCylinder(
+			const UObject* WorldContextObject, const FVector& Start,
+			const FVector& End, float Radius,
+			int32 Segments, const FColor& Color = FColor::Orange,
+			bool bPersistentLines = false, float LifeTime = -1.f,
+			uint8 DepthPriority = 0, float Thickness = 0);
+
+		
+		ThisClass& DrawDebugDirectionalArrow(
+			const UObject* WorldContextObject, const FVector& LineStart,
+			const FVector& LineEnd, float ArrowSize,
 			const FColor& Color = FColor::Orange,
-			bool bPersistentLines = false,
-			float LifeTime = -1.f,
+			bool bPersistentLines = false, float LifeTime = -1.f,
+			uint8 DepthPriority = 0, float Thickness = 0);
+
+		
+		ThisClass& DrawDebugLine(
+			const UObject* WorldContextObject, const FVector& LineStart,
+			const FVector& LineEnd, const FColor& Color = FColor::Orange,
+			bool bPersistentLines = false, float LifeTime = -1.f,
+			uint8 DepthPriority = 0, float Thickness = 0);
+
+		
+		ThisClass& DrawDebugPoint(const UObject* WorldContextObject,
+			const FVector& Position, float Size,
+			const FColor& Color = FColor::Orange,
+			bool bPersistentLines = false, float LifeTime = -1.f,
 			uint8 DepthPriority = 0);
 
-		ThisClass& DrawDebugSphere(const UObject* WorldContextObject,
-			const FVector& Center,
-			float Radius,
-			int32 Segments,
+		
+		ThisClass& DrawDebugSphere(
+			const UObject* WorldContextObject, const FVector& Center,
+			float Radius, int32 Segments,
 			const FColor& Color = FColor::Orange,
-			bool bPersistentLines = false,
-			float LifeTime = -1.f,
-			uint8 DepthPriority = 0,
-			float Thickness = 0);
+			bool bPersistentLines = false, float LifeTime = -1.f,
+			uint8 DepthPriority = 0, float Thickness = 0);
 
-		ThisClass& DrawDebugString(const UObject* WorldContextObject,
-			const FVector& TextLocation,
-			const FString& Text,
-			AActor* TestBaseActor = nullptr,
+		
+		ThisClass& DrawDebugString(
+			const UObject* WorldContextObject, const FVector& TextLocation,
+			const FString& Text, AActor* TestBaseActor = nullptr,
 			const FColor& TextColor = FColor::Orange,
 			float Duration = -1.f);
 
-		ThisClass& DrawDebugBox(const UObject* WorldContextObject,
-			const FVector& Center,
-			const FVector& Extent,
-			const FColor& Color = FColor::Orange,
-			bool bPersistentLines = false,
-			float LifeTime = -1.f,
+		
+		ThisClass& DrawDebugBox(
+			const UObject* WorldContextObject, const FVector& Center,
+			const FVector& Extent, const FColor& Color = FColor::Orange,
+			bool bPersistentLines = false, float LifeTime = -1.f,
 			uint8 DepthPriority = 0, float Thickness = 0);
 
 
 		// you may only use one visual log per macro.
 
 		// Logs text with the visual logger system.
-		DbgLogArgs& VisualLogText(const UObject* Owner,
+		DbgLogArgs& VisualLogText(
+			const UObject* Owner,
 			bool bOnlyLogVisually = true);
 
+		
 		// Logs a sphere with the visual logger system.
-		DbgLogArgs& VisualLogSphere(const UObject* Owner,
-			const FVector& Location, float Radius,
+		DbgLogArgs& VisualLogSphere(
+			const UObject* Owner, const FVector& Location,
+			float Radius,
+			FColor SphereColor = FColor::Orange,
 			bool bDrawWireframe = false,
 			bool bOnlyLogVisually = true);
 
+		
 		// Logs a box with the visual logger system.
-		DbgLogArgs& VisualLogBox(const UObject* Owner,
-			const FVector& MinExtent,
-			const FVector& MaxExtent,
-			const FVector& Location,
+		DbgLogArgs& VisualLogBox(
+			const UObject* Owner, const FVector& MinExtent,
+			const FVector& MaxExtent, const FVector& Location,
 			const FRotator& Rotation = FRotator::ZeroRotator,
 			FColor BoxColor = FColor::Orange,
 			bool bDrawWireframe = false,
 			bool bOnlyLogVisually = true);
 		
-		// Logs the provided actors bounds into the visual logger system.
-		DbgLogArgs& VisualLogBounds(const UObject* Owner,
-			const AActor* ActorToGetBoundsFrom,
-			FColor BoundsColor = FColor::Orange,
-			bool bDrawWireframe = false,
-			bool bOnlyLogVisually = true);
-
+		
 		// Logs a cone with the visual logger system.
-		DbgLogArgs& VisualLogCone(const UObject* Owner,
-			const FVector& Location,
-			const FVector& Direction,
-			float Length, float Angle,
-			FColor ConeColor = FColor::Orange,
-			bool bDrawWireframe = false,
-			bool bOnlyLogVisually = true);
+		DbgLogArgs& VisualLogCone(
+			const UObject* Owner, const FVector& Location,
+			const FVector& Direction, float Length,
+			float Angle, FColor ConeColor = FColor::Orange,
+			bool bDrawWireframe = false, bool bOnlyLogVisually = true);
+		
 
 		// Logs a line with the visual logger system.
-		DbgLogArgs& VisualLogLine(const UObject* Owner,
-			const FVector& Start,
-			const FVector& End,
-			float Thickness = 1.f,
+		DbgLogArgs& VisualLogLine(
+			const UObject* Owner, const FVector& Start,
+			const FVector& End, float Thickness = 1.f,
 			FColor LineColor = FColor::Orange,
 			bool bOnlyLogVisually = true);
 
+		
 		// Logs an arrow with the visual logger system.
-		DbgLogArgs& VisualLogArrow(const UObject* Owner,
-			const FVector& Start,
-			const FVector& End,
-			FColor ArrowColor = FColor::Orange,
+		DbgLogArgs& VisualLogArrow(
+			const UObject* Owner, const FVector& Start,
+			const FVector& End, FColor ArrowColor = FColor::Orange,
 			bool bOnlyLogVisually = true);
 
+		
 		// Logs a disk with the visual logger system.
-		DbgLogArgs& VisualLogDisk(const UObject* Owner,
-			const FVector& Start,
-			const FVector& UpDir,
-			float Radius,
+		DbgLogArgs& VisualLogDisk(
+			const UObject* Owner, const FVector& Start,
+			const FVector& UpDir, float Radius,
 			FColor DiskColor = FColor::Orange,
-			uint16 Thickness = 1,
-			bool bOnlyLogVisually = true);
+			uint16 Thickness = 1, bool bOnlyLogVisually = true,
+			bool bDrawWireframe = true);
 
+		
 		// Logs a capsule with the visual logger system.
-		DbgLogArgs& VisualLogCapsule(const UObject* Owner,
-			const FVector& Base,
-			const FRotator Rotation,
-			float Radius,
-			float HalfHeight,
-			FColor CapsuleColor = FColor::Orange,
-			bool bDrawWireframe = false,
+		DbgLogArgs& VisualLogCapsule(
+			const UObject* Owner, const FVector& Base,
+			const FRotator& Rotation, float Radius,
+			float HalfHeight, FColor CapsuleColor = FColor::Orange,
+			bool bDrawWireframe = false, bool bOnlyLogVisually = true);
+
+				
+		// Logs the provided actors bounds into the visual logger system.
+		DbgLogArgs& VisualLogBounds(
+			const UObject* Owner, const AActor* ActorToGetBoundsFrom,
+			FColor BoundsColor = FColor::Orange, bool bDrawWireframe = false,
 			bool bOnlyLogVisually = true);
 
 	private:
@@ -713,7 +704,10 @@ namespace DBG::Log
 
 			if constexpr (bAddIfMissing)
 			{
-				UE_LOG(dbgLOG, Warning, TEXT("Failed to to locate category %s, making state entry anyway."), *CategoryName.ToString());
+				UE_LOG(dbgLOG, Warning,
+					TEXT("Failed to to locate category %s, making state entry anyway."),
+					*CategoryName.ToString());
+				
 				CategoryMap.Emplace(CategoryName, {bNewState});
 			}
 		}
@@ -728,7 +722,9 @@ namespace DBG::Log
 	DBG_API extern FDbgLogSingleton GDbgLogSingleton;
 	
 	template<typename... A>
-	void Log(int32 UniqueIdentifier, std::source_location Location, DbgLogArgs LogArgs, std::wformat_string<TFormatted<A>...> Format, A&&... Args)
+	void Log(int32 UniqueIdentifier, std::source_location Location,
+		DbgLogArgs LogArgs, std::wformat_string<TFormatted<A>...> Format,
+		A&&... Args)
 	{
 		if(LogArgs.VerbosityValue == ELogVerbosity::NoLogging
 		|| LogArgs.bLogConditionValue == false)
@@ -746,11 +742,13 @@ namespace DBG::Log
 		}
 		else if (LogArgs.LogCategoryName.IsNone() == false && LogArgs.LogCategoryName != dbgLOG.GetCategoryName())
 		{
-			FName CategoryName = FName{FString::Format(TEXT("dbg{0}"), {LogArgs.LogCategoryName.ToString()})};
+			FName CategoryName = FName{FString::Format(
+				TEXT("dbg{0}"), {LogArgs.LogCategoryName.ToString()})};
+			
 			OptionallyCreatedCategory.Emplace(CategoryName);
 			LogCategory = &OptionallyCreatedCategory.GetValue();
 		}
-		else // Lastly fallback to the default if the user supplied no category.
+		else // Lastly, fallback to the default if the user supplied no category.
 		{
 			LogCategory = &dbgLOG;
 		}
@@ -766,14 +764,15 @@ namespace DBG::Log
 
 
 		// Configure how we present the log now.
+		
 		static auto NetModeToStr = [](ENetMode Mode) -> FString
 		{
-			static FString StandAlone{TEXT("Standalone")};
-			static FString DedicatedServer{TEXT("Dedicated Server")};
-			static FString ListenServer{TEXT("Listen Server")};
-			static FString Client{TEXT("Client")};
-			static FString Max{TEXT("MAX")};
-			static FString Unknown{TEXT("Unknown")};
+			static FString StandAlone		{TEXT("Standalone")};
+			static FString DedicatedServer	{TEXT("Dedicated Server")};
+			static FString ListenServer		{TEXT("Listen Server")};
+			static FString Client			{TEXT("Client")};
+			static FString Max				{TEXT("MAX")};
+			static FString Unknown			{TEXT("Unknown")};
 			
 			switch (Mode)
 			{
@@ -794,17 +793,24 @@ namespace DBG::Log
 				static FString NullWCO = TEXT("NullWorld");
 				return NullWCO;
 			}
+			
 			return FString::Format(TEXT("{0} | Instance: {1}"),
 				{NetModeToStr(W->GetNetMode()), WC->PIEInstance});
 		};
 
-		// make it a little nicer to read.
-		static auto SourceLocationToStr = [](std::source_location& L) -> FString
+		
+		// Make the source location a little nicer to read.
+		static auto SourceLocationToStr = [](std::source_location& Loc) -> FString
 		{
-			FString FuncName(L.function_name());
+			FString FuncName(Loc.function_name());
 			FuncName.ReplaceInline(TEXT(" __cdecl"), TEXT(""));
+			
 			return FString::Format(TEXT("[File: {0} ({1}), {2}]"),
-				{FPaths::GetCleanFilename(StringCast<wchar_t>(L.file_name()).Get()), L.line(), FuncName});
+				{
+					FPaths::GetCleanFilename(StringCast<wchar_t>(Loc.file_name()).Get()),
+						Loc.line(), FuncName
+				}
+			);
 		};
 
 
@@ -814,33 +820,39 @@ namespace DBG::Log
 		{
 			if (LogArgs.DateTimeFormat != nullptr)
 			{
-				MessagePrefixBuilder.Appendf(TEXT("(%s) "), *FDateTime::Now().ToString(LogArgs.DateTimeFormat.GetData()));
+				MessagePrefixBuilder.Appendf(TEXT("(%s) "),
+					*FDateTime::Now().ToString(LogArgs.DateTimeFormat.GetData()));
 			}
 			else
 			{
-				MessagePrefixBuilder.Appendf(TEXT("(%s) "), *FDateTime::Now().ToString());
+				MessagePrefixBuilder.Appendf(TEXT("(%s) "),
+					*FDateTime::Now().ToString());
 			}
 		}
 
 		if (LogArgs.PrefixValue.Len() > 0)
 		{
-			MessagePrefixBuilder.Appendf(TEXT("[%s] "), *LogArgs.PrefixValue);
+			MessagePrefixBuilder.Appendf(TEXT("[%s] "),
+				*LogArgs.PrefixValue);
 		}
 
 		if (const UWorld* W = LogArgs.WCOResultValue)
 		{
 			if (LogArgs.bLogSourceLocation)
 			{
-				MessagePrefixBuilder.Appendf(TEXT("[%s] %s "), *WorldToString(W), *SourceLocationToStr(Location));
+				MessagePrefixBuilder.Appendf(TEXT("[%s] %s "),
+					*WorldToString(W), *SourceLocationToStr(Location));
 			}
 			else
 			{
-				MessagePrefixBuilder.Appendf(TEXT("[%s] "), *WorldToString(W));
+				MessagePrefixBuilder.Appendf(TEXT("[%s] "),
+					*WorldToString(W));
 			}
 		}
 		else if (LogArgs.bLogSourceLocation)
 		{
-			MessagePrefixBuilder.Appendf(TEXT("%s "), *SourceLocationToStr(Location));
+			MessagePrefixBuilder.Appendf(TEXT("%s "),
+				*SourceLocationToStr(Location));
 		}
 
 		if (MessagePrefixBuilder.Len() > 0)
@@ -858,14 +870,16 @@ namespace DBG::Log
 			{
 				case DbgLogArgs::EDbgVisualLogShape::None:
 					{
-						FVisualLogger::CategorizedLogf(LogArgs.VisualLoggerOwnerValue, *LogCategory,
+						FVisualLogger::CategorizedLogf(
+							LogArgs.VisualLoggerOwnerValue, *LogCategory,
 							LogArgs.VerbosityValue, TEXT("%s"), *Message);
 						break;
 					}
 				case DbgLogArgs::EDbgVisualLogShape::Sphere:
 					{
 	#if UE_VERSION_NEWER_THAN(5, 4, 0)
-						FVisualLogger::SphereLogf(LogArgs.VisualLoggerOwnerValue,
+						FVisualLogger::SphereLogf(
+							LogArgs.VisualLoggerOwnerValue,
 							*LogCategory, LogArgs.VerbosityValue,
 							LogArgs.VisualLogShapeLocationValue,
 							LogArgs.VisualLogVectorOne.X,
@@ -873,7 +887,8 @@ namespace DBG::Log
 							LogArgs.bDrawWireframeValue,
 							TEXT("%s"), *Message);
 	#else
-						FVisualLogger::GeometryShapeLogf(LogArgs.VisualLoggerOwnerValue,
+						FVisualLogger::GeometryShapeLogf(
+							LogArgs.VisualLoggerOwnerValue,
 							*LogCategory, LogArgs.VerbosityValue,
 							LogArgs.VisualLogShapeLocationValue,
 							LogArgs.VisualLogVectorOne.X,
@@ -885,7 +900,8 @@ namespace DBG::Log
 				case DbgLogArgs::EDbgVisualLogShape::Box:
 					{
 	#if UE_VERSION_NEWER_THAN(5, 4, 0)
-						FVisualLogger::BoxLogf(LogArgs.VisualLoggerOwnerValue,
+						FVisualLogger::BoxLogf(
+							LogArgs.VisualLoggerOwnerValue,
 							*LogCategory, LogArgs.VerbosityValue,
 							FBox{LogArgs.VisualLogVectorOne, LogArgs.VisualLogVectorTwo},
 							FMatrix{FScaleMatrix(LogArgs.VisualLogShapeScaleValue) *
@@ -895,7 +911,8 @@ namespace DBG::Log
 							LogArgs.bDrawWireframeValue,
 							TEXT("%s"), *Message);
 	#else
-						FVisualLogger::GeometryBoxLogf(LogArgs.VisualLoggerOwnerValue,
+						FVisualLogger::GeometryBoxLogf(
+							LogArgs.VisualLoggerOwnerValue,
 							*LogCategory, LogArgs.VerbosityValue,
 							FBox{LogArgs.VisualLogVectorOne, LogArgs.VisualLogVectorTwo},
 							FMatrix{FScaleMatrix(LogArgs.VisualLogShapeScaleValue) *
@@ -909,7 +926,8 @@ namespace DBG::Log
 				case DbgLogArgs::EDbgVisualLogShape::Cone:
 					{
 	#if UE_VERSION_NEWER_THAN(5, 4, 0)
-						FVisualLogger::ConeLogf(LogArgs.VisualLoggerOwnerValue,
+						FVisualLogger::ConeLogf(
+							LogArgs.VisualLoggerOwnerValue,
 							*LogCategory, LogArgs.VerbosityValue,
 							LogArgs.VisualLogShapeLocationValue,
 							LogArgs.VisualLogVectorOne,
@@ -919,7 +937,8 @@ namespace DBG::Log
 							LogArgs.bDrawWireframeValue,
 							TEXT("%s"), *Message);
 	#else
-						FVisualLogger::GeometryShapeLogf(LogArgs.VisualLoggerOwnerValue,
+						FVisualLogger::GeometryShapeLogf(
+							LogArgs.VisualLoggerOwnerValue,
 							*LogCategory, LogArgs.VerbosityValue,
 							LogArgs.VisualLogShapeLocationValue,
 							LogArgs.VisualLogVectorOne,
@@ -928,13 +947,14 @@ namespace DBG::Log
 							LogArgs.VisualLogShapeColorValue,
 							TEXT("%s"), *Message);
 						
-						break;
 	#endif
+						break;
 					}
 				case DbgLogArgs::EDbgVisualLogShape::Line:
 					{
 	#if UE_VERSION_NEWER_THAN(5, 4, 0)
-						FVisualLogger::SegmentLogf(LogArgs.VisualLoggerOwnerValue,
+						FVisualLogger::SegmentLogf(
+							LogArgs.VisualLoggerOwnerValue,
 							*LogCategory, LogArgs.VerbosityValue,
 							LogArgs.VisualLogShapeLocationValue,
 							LogArgs.VisualLogVectorOne,
@@ -942,7 +962,8 @@ namespace DBG::Log
 							static_cast<uint16>(LogArgs.VisualLogVectorTwo.X),
 							TEXT("%s"), *Message);
 	#else
-						FVisualLogger::GeometryShapeLogf(LogArgs.VisualLoggerOwnerValue,
+						FVisualLogger::GeometryShapeLogf(
+							LogArgs.VisualLoggerOwnerValue,
 							*LogCategory, LogArgs.VerbosityValue,
 							LogArgs.VisualLogShapeLocationValue,
 							LogArgs.VisualLogVectorOne,
@@ -955,17 +976,41 @@ namespace DBG::Log
 					}
 				case DbgLogArgs::EDbgVisualLogShape::Arrow:
 					{
-						FVisualLogger::ArrowLogf(LogArgs.VisualLoggerOwnerValue,
+	#if UE_VERSION_NEWER_THAN_OR_EQUAL(5, 6, 0)
+						FVisualLogger::ArrowLineLogf(
+							LogArgs.VisualLoggerOwnerValue,
+							*LogCategory, LogArgs.VerbosityValue,
+							LogArgs.VisualLogShapeLocationValue,
+							LogArgs.VisualLogVectorOne,
+							LogArgs.VisualLogShapeColorValue, 0,
+							TEXT("%s"), *Message);
+	#else
+						FVisualLogger::ArrowLogf(
+							LogArgs.VisualLoggerOwnerValue,
 							*LogCategory, LogArgs.VerbosityValue,
 							LogArgs.VisualLogShapeLocationValue,
 							LogArgs.VisualLogVectorOne,
 							LogArgs.VisualLogShapeColorValue,
 							TEXT("%s"), *Message);
+	#endif
 						break;
 					}
 				case DbgLogArgs::EDbgVisualLogShape::Disk:
 					{
-						FVisualLogger::CircleLogf(LogArgs.VisualLoggerOwnerValue,
+	#if UE_VERSION_NEWER_THAN_OR_EQUAL(5, 6, 0)
+						FVisualLogger::DiscLogf(
+							LogArgs.VisualLoggerOwnerValue,
+							*LogCategory, LogArgs.VerbosityValue,
+							LogArgs.VisualLogShapeLocationValue,
+							LogArgs.VisualLogVectorOne,
+							LogArgs.VisualLogVectorTwo.X,
+							LogArgs.VisualLogShapeColorValue,
+							static_cast<uint16>(LogArgs.VisualLogVectorTwo.Y),
+							LogArgs.bDrawWireframeValue,
+							TEXT("%s"), *Message);
+	#else
+						FVisualLogger::CircleLogf(
+							LogArgs.VisualLoggerOwnerValue,
 							*LogCategory, LogArgs.VerbosityValue,
 							LogArgs.VisualLogShapeLocationValue,
 							LogArgs.VisualLogVectorOne,
@@ -973,12 +1018,14 @@ namespace DBG::Log
 							LogArgs.VisualLogShapeColorValue,
 							static_cast<uint16>(LogArgs.VisualLogVectorTwo.Y),
 							TEXT("%s"), *Message);
+	#endif
 						break;
 					}
 				case DbgLogArgs::EDbgVisualLogShape::Capsule:
 					{
 	#if UE_VERSION_NEWER_THAN(5, 4, 0)
-						FVisualLogger::CapsuleLogf(LogArgs.VisualLoggerOwnerValue,
+						FVisualLogger::CapsuleLogf(
+							LogArgs.VisualLoggerOwnerValue,
 							*LogCategory, LogArgs.VerbosityValue,
 							LogArgs.VisualLogShapeLocationValue,
 							LogArgs.VisualLogVectorOne.X,
@@ -988,8 +1035,9 @@ namespace DBG::Log
 							LogArgs.bDrawWireframeValue,
 							TEXT("%s"), *Message);
 	#else
-						FVisualLogger::GeometryShapeLogf(LogArgs.VisualLoggerOwnerValue,
-							LogCategory, LogArgs.VerbosityValue,
+						FVisualLogger::GeometryShapeLogf(
+							LogArgs.VisualLoggerOwnerValue,
+							*LogCategory, LogArgs.VerbosityValue,
 							LogArgs.VisualLogShapeLocationValue,
 							LogArgs.VisualLogVectorOne.X,
 							LogArgs.VisualLogVectorOne.Y,
@@ -1031,12 +1079,16 @@ namespace DBG::Log
 
 				if (LogArgs.bLogToEditorMessageLog)
 				{
-					FMessageLog MsgLog(LogCategory->GetCategoryName());
-					MsgLog.Info(FText::FromString(Message));
-
 					if (LogArgs.bShowEditorMessageLogImmediately)
 					{
+						FMessageLog MsgLog(LogCategory->GetCategoryName());
+						MsgLog.Info(FText::FromString(Message));
 						MsgLog.Open(EMessageSeverity::Type::Info);
+					}
+					else
+					{
+						// Piggy back of PIE which will auto open the message log if any entries exist.
+						FMessageLog("PIE").Info(FText::FromString(Message));
 					}
 				}
 				break;
@@ -1062,12 +1114,16 @@ namespace DBG::Log
 
 				if (LogArgs.bLogToEditorMessageLog)
 				{
-					FMessageLog MsgLog(LogCategory->GetCategoryName());
-					MsgLog.Warning(FText::FromString(Message));
-					
 					if (LogArgs.bShowEditorMessageLogImmediately)
 					{
+						FMessageLog MsgLog(LogCategory->GetCategoryName());
+						MsgLog.Warning(FText::FromString(Message));
 						MsgLog.Open(EMessageSeverity::Type::Warning);
+					}
+					else
+					{
+						// Piggy back of PIE which will auto open the message log if any entries exist.
+						FMessageLog("PIE").Warning(FText::FromString(Message));
 					}
 				}
 				break;
@@ -1093,12 +1149,16 @@ namespace DBG::Log
 
 				if (LogArgs.bLogToEditorMessageLog)
 				{
-					FMessageLog MsgLog(LogCategory->GetCategoryName());
-					MsgLog.Error(FText::FromString(Message));
-					
 					if (LogArgs.bShowEditorMessageLogImmediately)
 					{
+						FMessageLog MsgLog(LogCategory->GetCategoryName());
+						MsgLog.Error(FText::FromString(Message));
 						MsgLog.Open(EMessageSeverity::Type::Error);
+					}
+					else
+					{
+						// Piggy back of PIE which will auto open the message log if any entries exist.
+						FMessageLog("PIE").Error(FText::FromString(Message));
 					}
 				}
 				break;
@@ -1124,12 +1184,16 @@ namespace DBG::Log
 
 				if (LogArgs.bLogToEditorMessageLog)
 				{
-					FMessageLog MsgLog(LogCategory->GetCategoryName());
-					MsgLog.Error(FText::FromString(Message));
-					
 					if (LogArgs.bShowEditorMessageLogImmediately)
 					{
+						FMessageLog MsgLog(LogCategory->GetCategoryName());
+						MsgLog.Error(FText::FromString(Message));
 						MsgLog.Open(EMessageSeverity::Type::Error);
+					}
+					else
+					{
+						// Piggy back of PIE which will auto open the message log if any entries exist.
+						FMessageLog("PIE").Error(FText::FromString(Message));
 					}
 				}
 				break;
@@ -1156,12 +1220,16 @@ namespace DBG::Log
 
 				if (LogArgs.bLogToEditorMessageLog)
 				{
-					FMessageLog MsgLog(LogCategory->GetCategoryName());
-					MsgLog.Info(FText::FromString(Message));
-					
 					if (LogArgs.bShowEditorMessageLogImmediately)
 					{
+						FMessageLog MsgLog(LogCategory->GetCategoryName());
+						MsgLog.Info(FText::FromString(Message));
 						MsgLog.Open(EMessageSeverity::Type::Info);
+					}
+					else
+					{
+						// Piggy back of PIE which will auto open the message log if any entries exist.
+						FMessageLog("PIE").Info(FText::FromString(Message));
 					}
 				}
 				break;
@@ -1181,9 +1249,10 @@ namespace DBG::Log
 		}
 
 		// Return early if we had no intention of logging to the screen/console
-		if (	LogArgs.bOnlyLogToSlateNotify
-			|| 	LogArgs.bOnlyLogToMessageDialog
-			|| (LogArgs.bLogToEditorMessageLog && LogArgs.OutputDestinationValue == EDbgLogOutput::Con)) // The output message log already handles console logging for us.
+		if (LogArgs.bOnlyLogToSlateNotify
+			|| LogArgs.bOnlyLogToMessageDialog
+			|| (LogArgs.bLogToEditorMessageLog
+				&& LogArgs.OutputDestinationValue == EDbgLogOutput::Con)) // The output message log already handles console logging for us.
 		{
 			return;
 		}
@@ -1204,7 +1273,10 @@ namespace DBG::Log
 
 
 		// This is basically UE_LOG but expanded so we dont need compile time log category stuff
-		static auto OutputLog = [](const std::source_location& Loc, const FLogCategoryBase& LC, ELogVerbosity::Type Verb, const FString& Msg)
+		// also allows our logs to correctly associate with the dbgLOG macros location rather
+		// than here in the function.
+		static auto OutputLog = [](const std::source_location& Loc, const FLogCategoryBase& LC,
+			ELogVerbosity::Type Verb, const FString& Msg)
 		{
 			static ::UE::Logging::Private::FStaticBasicLogDynamicData LOG_Dynamic;
 			static ::UE::Logging::Private::FStaticBasicLogRecord LOG_Static(TEXT("%s"),
@@ -1232,7 +1304,6 @@ namespace DBG::Log
 		};
 
 		
-
 		switch (LogArgs.OutputDestinationValue)
 		{
 		case EDbgLogOutput::Con:
@@ -1272,49 +1343,58 @@ namespace DBG::Log
 
 	
 	
-	inline DbgLogArgs::ThisClass& DbgLogArgs::DrawDebugCapsule(const UObject* WorldContextObject,
-		const FVector& Center, float HalfHeight, float Radius,
-		const FQuat& Rotation, const FColor& Color, bool bPersistentLines,
-		float LifeTime, uint8 DepthPriority, float Thickness)
+	inline DbgLogArgs::ThisClass& DbgLogArgs::DrawDebugCapsule(
+		const UObject* WorldContextObject, const FVector& Center,
+		float HalfHeight, float Radius, const FQuat& Rotation,
+		const FColor& Color, bool bPersistentLines, float LifeTime,
+		uint8 DepthPriority, float Thickness)
 	{
 		if (const UWorld* W = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::ReturnNull))
 		{
-			::DrawDebugCapsule(W, Center, HalfHeight, Radius,
-			                    Rotation, Color, bPersistentLines, LifeTime,
-			                    DepthPriority, Thickness);
+			::DrawDebugCapsule(
+				W, Center, HalfHeight, Radius,
+			    Rotation, Color, bPersistentLines, LifeTime,
+			    DepthPriority, Thickness);
 		}
 			
 		return *this;
 	}
 
 	
-	inline DbgLogArgs::ThisClass& DbgLogArgs::DrawDebugCone(const UObject* WorldContextObject,
-		const FVector& Origin, const FVector& Direction, float Length,
-		float AngleWidth, float AngleHeight, int32 NumSides,
-		const FColor& Color, bool bPersistentLines, float LifeTime,
+	inline DbgLogArgs::ThisClass& DbgLogArgs::DrawDebugCone(
+		const UObject* WorldContextObject, const FVector& Origin,
+		const FVector& Direction, float Length, float AngleWidth,
+		float AngleHeight, int32 NumSides, const FColor& Color,
+		bool bPersistentLines, float LifeTime,
 		uint8 DepthPriority, float Thickness)
 	{
 		if (const UWorld* W = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::ReturnNull))
 		{
-			::DrawDebugCone(W, Origin, Direction, Length,
-			                 FMath::DegreesToRadians(AngleWidth), FMath::DegreesToRadians(AngleHeight), NumSides, Color,
-			                 bPersistentLines, LifeTime, DepthPriority, Thickness);
+			::DrawDebugCone(
+				W, Origin, Direction, Length,
+			    FMath::DegreesToRadians(AngleWidth),
+			    FMath::DegreesToRadians(AngleHeight),
+			    NumSides, Color, bPersistentLines,
+			    LifeTime, DepthPriority, Thickness);
 				
 		}
 		return *this;
 	}
 
 	
-	inline DbgLogArgs::ThisClass& DbgLogArgs::DrawDebugCylinder(const UObject* WorldContextObject,
-		const FVector& Start, const FVector& End, float Radius,
-		int32 Segments, const FColor& Color, bool bPersistentLines,
-		float LifeTime, uint8 DepthPriority, float Thickness)
+	inline DbgLogArgs::ThisClass& DbgLogArgs::DrawDebugCylinder(
+		const UObject* WorldContextObject, const FVector& Start,
+		const FVector& End, float Radius,
+		int32 Segments, const FColor& Color,
+		bool bPersistentLines, float LifeTime,
+		uint8 DepthPriority, float Thickness)
 	{
 		if (const UWorld* W = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::ReturnNull))
 		{
-			::DrawDebugCylinder(W, Start, End, Radius,
-			                     Segments, Color, bPersistentLines, LifeTime,
-			                     DepthPriority, Thickness);
+			::DrawDebugCylinder(
+				W, Start, End, Radius,
+			    Segments, Color, bPersistentLines,
+			    LifeTime, DepthPriority, Thickness);
 		}
 		
 			
@@ -1322,89 +1402,107 @@ namespace DBG::Log
 	}
 
 	
-	inline DbgLogArgs::ThisClass& DbgLogArgs::DrawDebugDirectionalArrow(const UObject* WorldContextObject,
-		const FVector& LineStart, const FVector& LineEnd, float ArrowSize, const FColor& Color,
-		bool bPersistentLines, float LifeTime, uint8 DepthPriority, float Thickness)
+	inline DbgLogArgs::ThisClass& DbgLogArgs::DrawDebugDirectionalArrow(
+		const UObject* WorldContextObject, const FVector& LineStart,
+		const FVector& LineEnd, float ArrowSize, const FColor& Color,
+		bool bPersistentLines, float LifeTime,
+		uint8 DepthPriority, float Thickness)
 	{
 		if (const UWorld* W = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::ReturnNull))
 		{
-			::DrawDebugDirectionalArrow(W, LineStart, LineEnd, ArrowSize,
-			                             Color, bPersistentLines, LifeTime, DepthPriority,
-			                             Thickness);
+			::DrawDebugDirectionalArrow(
+				W, LineStart, LineEnd, ArrowSize,
+			    Color, bPersistentLines, LifeTime,
+			    DepthPriority, Thickness);
 		}
 		return *this;
 	}
 
 	
-	inline DbgLogArgs::ThisClass& DbgLogArgs::DrawDebugLine(const UObject* WorldContextObject,
-		const FVector& LineStart, const FVector& LineEnd, const FColor& Color,
-		bool bPersistentLines, float LifeTime, uint8 DepthPriority, float Thickness)
+	inline DbgLogArgs::ThisClass& DbgLogArgs::DrawDebugLine(
+		const UObject* WorldContextObject, const FVector& LineStart,
+		const FVector& LineEnd, const FColor& Color,
+		bool bPersistentLines, float LifeTime,
+		uint8 DepthPriority, float Thickness)
 	{
 		if (const UWorld* W = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::ReturnNull))
 		{
-			::DrawDebugLine(W, LineStart, LineEnd, Color,
-			                 bPersistentLines, LifeTime, DepthPriority,
-			                 Thickness);
+			::DrawDebugLine(
+				W, LineStart, LineEnd, Color,
+			    bPersistentLines, LifeTime,
+			    DepthPriority, Thickness);
 		}
 		return *this;
 	}
 
 	
-	inline DbgLogArgs::ThisClass& DbgLogArgs::DrawDebugPoint(const UObject* WorldContextObject,
-		const FVector& Position, float Size, const FColor& Color,
-		bool bPersistentLines, float LifeTime, uint8 DepthPriority)
+	inline DbgLogArgs::ThisClass& DbgLogArgs::DrawDebugPoint(
+		const UObject* WorldContextObject, const FVector& Position,
+		float Size, const FColor& Color, bool bPersistentLines,
+		float LifeTime, uint8 DepthPriority)
 	{
 		if (const UWorld* W = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::ReturnNull))
 		{
-			::DrawDebugPoint(W, Position, Size, Color,
-			                  bPersistentLines, LifeTime, DepthPriority);
+			::DrawDebugPoint(
+				W, Position, Size,
+				Color, bPersistentLines,
+				LifeTime, DepthPriority);
 		}
 		return *this;
 	}
 
 	
-	inline DbgLogArgs::ThisClass& DbgLogArgs::DrawDebugSphere(const UObject* WorldContextObject,
-		const FVector& Center, float Radius, int32 Segments, const FColor& Color,
+	inline DbgLogArgs::ThisClass& DbgLogArgs::DrawDebugSphere(
+		const UObject* WorldContextObject, const FVector& Center,
+		float Radius, int32 Segments, const FColor& Color,
 		bool bPersistentLines, float LifeTime, uint8 DepthPriority,
 		float Thickness)
 	{
 		if (const UWorld* W = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::ReturnNull))
 		{
-			::DrawDebugSphere(W, Center, Radius, Segments,
-			                   Color, bPersistentLines, LifeTime, DepthPriority,
-			                   Thickness);
+			::DrawDebugSphere(
+				W, Center, Radius, Segments,
+			    Color, bPersistentLines, LifeTime,
+			    DepthPriority, Thickness);
 		}
 		return *this;
 	}
 	
 
-	inline DbgLogArgs::ThisClass& DbgLogArgs::DrawDebugString(const UObject* WorldContextObject,
-		const FVector& TextLocation, const FString& Text,
-		AActor* TestBaseActor, const FColor& TextColor, float Duration)
+	inline DbgLogArgs::ThisClass& DbgLogArgs::DrawDebugString(
+		const UObject* WorldContextObject, const FVector& TextLocation,
+		const FString& Text, AActor* TestBaseActor,
+		const FColor& TextColor, float Duration)
 	{
 		if (const UWorld* W = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::ReturnNull))
 		{
-			::DrawDebugString(W, TextLocation, Text, TestBaseActor,
-			                   TextColor, Duration);
+			::DrawDebugString(
+				W, TextLocation, Text,
+				TestBaseActor, TextColor, Duration);
 		}
 		return *this;
 	}
 
-	inline DbgLogArgs::ThisClass& DbgLogArgs::DrawDebugBox(const UObject* WorldContextObject,
-		const FVector& Center, const FVector& Extent, const FColor& Color,
-		bool bPersistentLines, float LifeTime, uint8 DepthPriority, float Thickness)
+	inline DbgLogArgs::ThisClass& DbgLogArgs::DrawDebugBox(
+		const UObject* WorldContextObject, const FVector& Center,
+		const FVector& Extent, const FColor& Color,
+		bool bPersistentLines, float LifeTime,
+		uint8 DepthPriority, float Thickness)
 	{
 		if (const UWorld* W = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::ReturnNull))
 		{
-			::DrawDebugBox(W, Center, Extent, Color,
-			                bPersistentLines, LifeTime, DepthPriority, Thickness);
+			::DrawDebugBox(
+				W, Center, Extent, Color,
+			    bPersistentLines, LifeTime,
+			    DepthPriority, Thickness);
 			
 		}
 		return *this;
 	}
 
 	
-	inline DbgLogArgs& DbgLogArgs::VisualLogText(const UObject* Owner, bool bOnlyLogVisually)
+	inline DbgLogArgs& DbgLogArgs::VisualLogText(
+		const UObject* Owner, bool bOnlyLogVisually)
 	{
 		VisualLoggerOwnerValue = Owner;
 		VisualLogShapeValue = EDbgVisualLogShape::None;
@@ -1413,7 +1511,9 @@ namespace DBG::Log
 	}
 
 	
-	inline DbgLogArgs& DbgLogArgs::VisualLogSphere(const UObject* Owner, const FVector& Location, float Radius,
+	inline DbgLogArgs& DbgLogArgs::VisualLogSphere(
+		const UObject* Owner, const FVector& Location,
+		float Radius, FColor SphereColor,
 		bool bDrawWireframe, bool bOnlyLogVisually)
 	{
 		// Only support a single visual log per macro.
@@ -1421,7 +1521,8 @@ namespace DBG::Log
 		{
 			VisualLoggerOwnerValue = Owner;
 			VisualLogShapeValue = EDbgVisualLogShape::Sphere;
-
+			VisualLogShapeColorValue = SphereColor;
+			
 			VisualLogShapeLocationValue = Location;
 			VisualLogVectorOne.X = Radius;
 
@@ -1432,9 +1533,11 @@ namespace DBG::Log
 	}
 
 	
-	inline DbgLogArgs& DbgLogArgs::VisualLogBox(const UObject* Owner, const FVector& MinExtent,
-		const FVector& MaxExtent, const FVector& Location, const FRotator& Rotation,
-		FColor BoxColor, bool bDrawWireframe, bool bOnlyLogVisually)
+	inline DbgLogArgs& DbgLogArgs::VisualLogBox(
+		const UObject* Owner, const FVector& MinExtent,
+		const FVector& MaxExtent, const FVector& Location,
+		const FRotator& Rotation, FColor BoxColor,
+		bool bDrawWireframe, bool bOnlyLogVisually)
 	{
 		// Only support a single visual log per macro.
 		if (VisualLoggerOwnerValue == nullptr)
@@ -1448,6 +1551,123 @@ namespace DBG::Log
 
 			VisualLogVectorOne = MinExtent;
 			VisualLogVectorTwo = MaxExtent;
+				
+			bDrawWireframeValue = bDrawWireframe;
+			bOnlyUseVisualLogger = bOnlyLogVisually;
+		}
+		return *this;
+	}
+
+	
+	inline DbgLogArgs& DbgLogArgs::VisualLogCone(
+		const UObject* Owner, const FVector& Location,
+		const FVector& Direction, float Length, float Angle,
+		FColor ConeColor, bool bDrawWireframe, bool bOnlyLogVisually)
+	{
+		// Only support a single visual log per macro.
+		if (VisualLoggerOwnerValue == nullptr)
+		{
+			VisualLoggerOwnerValue = Owner;
+			VisualLogShapeValue = EDbgVisualLogShape::Cone;
+			VisualLogShapeColorValue = ConeColor;
+
+			VisualLogShapeLocationValue = Location;
+
+			VisualLogVectorOne = Direction;
+			VisualLogVectorTwo.X = Length;
+			VisualLogVectorTwo.Y = Angle;
+				
+			bDrawWireframeValue = bDrawWireframe;
+			bOnlyUseVisualLogger = bOnlyLogVisually;
+		}
+		return *this;
+	}
+
+	
+	inline DbgLogArgs& DbgLogArgs::VisualLogLine(
+		const UObject* Owner, const FVector& Start,
+		const FVector& End, float Thickness,
+		FColor LineColor,bool bOnlyLogVisually)
+	{
+		// Only support a single visual log per macro.
+		if (VisualLoggerOwnerValue == nullptr)
+		{
+			VisualLoggerOwnerValue = Owner;
+			VisualLogShapeValue = EDbgVisualLogShape::Line;
+			VisualLogShapeColorValue = LineColor;
+
+			VisualLogShapeLocationValue = Start;
+			VisualLogVectorOne = End;
+			VisualLogVectorTwo.X = Thickness;
+				
+			bOnlyUseVisualLogger = bOnlyLogVisually;
+		}
+		return *this;
+	}
+
+
+	inline DbgLogArgs& DbgLogArgs::VisualLogArrow(
+		const UObject* Owner, const FVector& Start,
+		const FVector& End, FColor ArrowColor,
+		bool bOnlyLogVisually)
+	{
+		// Only support a single visual log per macro.
+		if (VisualLoggerOwnerValue == nullptr)
+		{
+			VisualLoggerOwnerValue = Owner;
+			VisualLogShapeValue = EDbgVisualLogShape::Arrow;
+			VisualLogShapeColorValue = ArrowColor;
+
+			VisualLogShapeLocationValue = Start;
+			VisualLogVectorOne = End;
+				
+			bOnlyUseVisualLogger = bOnlyLogVisually;
+		}
+		return *this;
+	}
+
+		
+	inline DbgLogArgs& DbgLogArgs::VisualLogDisk(
+		const UObject* Owner, const FVector& Start,
+		const FVector& UpDir, float Radius, FColor ArrowColor,
+		uint16 Thickness, bool bOnlyLogVisually, bool bDrawWireframe)
+	{
+		// Only support a single visual log per macro.
+		if (VisualLoggerOwnerValue == nullptr)
+		{
+			VisualLoggerOwnerValue = Owner;
+			VisualLogShapeValue = EDbgVisualLogShape::Disk;
+			VisualLogShapeColorValue = ArrowColor;
+
+			VisualLogShapeLocationValue = Start;
+			VisualLogVectorOne = UpDir;
+			VisualLogVectorTwo.X = Radius;
+			VisualLogVectorTwo.Y = Thickness;
+				
+			bOnlyUseVisualLogger = bOnlyLogVisually;
+			bDrawWireframeValue = bDrawWireframe;
+		}
+		return *this;
+	}
+
+	
+	inline DbgLogArgs& DbgLogArgs::VisualLogCapsule(
+		const UObject* Owner, const FVector& Base,
+		const FRotator& Rotation, float Radius,
+		float HalfHeight, FColor CapsuleColor,
+		bool bDrawWireframe, bool bOnlyLogVisually)
+	{
+		// Only support a single visual log per macro.
+		if (VisualLoggerOwnerValue == nullptr)
+		{
+			VisualLoggerOwnerValue = Owner;
+			VisualLogShapeValue = EDbgVisualLogShape::Capsule;
+			VisualLogShapeColorValue = CapsuleColor;
+
+			VisualLogShapeLocationValue = Base;
+			VisualLogShapeRotationValue = Rotation;
+			VisualLogVectorOne.X = HalfHeight;
+			VisualLogVectorOne.Y = Radius;
 				
 			bDrawWireframeValue = bDrawWireframe;
 			bOnlyUseVisualLogger = bOnlyLogVisually;
@@ -1471,115 +1691,7 @@ namespace DBG::Log
 		return *this;
 	}
 
-	
-	inline DbgLogArgs& DbgLogArgs::VisualLogCone(const UObject* Owner,
-		const FVector& Location, const FVector& Direction,
-	    float Length, float Angle, FColor ConeColor, bool bDrawWireframe, bool bOnlyLogVisually)
-	{
-		// Only support a single visual log per macro.
-		if (VisualLoggerOwnerValue == nullptr)
-		{
-			VisualLoggerOwnerValue = Owner;
-			VisualLogShapeValue = EDbgVisualLogShape::Cone;
-			VisualLogShapeColorValue = ConeColor;
 
-			VisualLogShapeLocationValue = Location;
-
-			VisualLogVectorOne = Direction;
-			VisualLogVectorTwo.X = Length;
-			VisualLogVectorTwo.Y = Angle;
-				
-			bDrawWireframeValue = bDrawWireframe;
-			bOnlyUseVisualLogger = bOnlyLogVisually;
-		}
-		return *this;
-	}
-
-	
-	inline DbgLogArgs& DbgLogArgs::VisualLogLine(const UObject* Owner,
-		const FVector& Start, const FVector& End,
-		float Thickness, FColor LineColor,bool bOnlyLogVisually)
-	{
-		// Only support a single visual log per macro.
-		if (VisualLoggerOwnerValue == nullptr)
-		{
-			VisualLoggerOwnerValue = Owner;
-			VisualLogShapeValue = EDbgVisualLogShape::Line;
-			VisualLogShapeColorValue = LineColor;
-
-			VisualLogShapeLocationValue = Start;
-			VisualLogVectorOne = End;
-			VisualLogVectorTwo.X = Thickness;
-				
-			bOnlyUseVisualLogger = bOnlyLogVisually;
-		}
-		return *this;
-	}
-
-	
-	inline DbgLogArgs& DbgLogArgs::VisualLogArrow(const UObject* Owner,
-		const FVector& Start, const FVector& End,
-		FColor ArrowColor,bool bOnlyLogVisually)
-	{
-		// Only support a single visual log per macro.
-		if (VisualLoggerOwnerValue == nullptr)
-		{
-			VisualLoggerOwnerValue = Owner;
-			VisualLogShapeValue = EDbgVisualLogShape::Arrow;
-			VisualLogShapeColorValue = ArrowColor;
-
-			VisualLogShapeLocationValue = Start;
-			VisualLogVectorOne = End;
-				
-			bOnlyUseVisualLogger = bOnlyLogVisually;
-		}
-		return *this;
-	}
-
-	
-	inline DbgLogArgs& DbgLogArgs::VisualLogDisk(const UObject* Owner,
-		const FVector& Start, const FVector& UpDir, float Radius,
-		FColor ArrowColor, uint16 Thickness, bool bOnlyLogVisually)
-	{
-		// Only support a single visual log per macro.
-		if (VisualLoggerOwnerValue == nullptr)
-		{
-			VisualLoggerOwnerValue = Owner;
-			VisualLogShapeValue = EDbgVisualLogShape::Disk;
-			VisualLogShapeColorValue = ArrowColor;
-
-			VisualLogShapeLocationValue = Start;
-			VisualLogVectorOne = UpDir;
-			VisualLogVectorTwo.X = Radius;
-			VisualLogVectorTwo.Y = Thickness;
-				
-			bOnlyUseVisualLogger = bOnlyLogVisually;
-		}
-		return *this;
-	}
-
-	
-	inline DbgLogArgs& DbgLogArgs::VisualLogCapsule(const UObject* Owner,
-		const FVector& Base, const FRotator Rotation, float Radius,
-		float HalfHeight, FColor CapsuleColor, bool bDrawWireframe, bool bOnlyLogVisually)
-	{
-		// Only support a single visual log per macro.
-		if (VisualLoggerOwnerValue == nullptr)
-		{
-			VisualLoggerOwnerValue = Owner;
-			VisualLogShapeValue = EDbgVisualLogShape::Capsule;
-			VisualLogShapeColorValue = CapsuleColor;
-
-			VisualLogShapeLocationValue = Base;
-			VisualLogShapeRotationValue = Rotation;
-			VisualLogVectorOne.X = HalfHeight;
-			VisualLogVectorOne.Y = Radius;
-				
-			bDrawWireframeValue = bDrawWireframe;
-			bOnlyUseVisualLogger = bOnlyLogVisually;
-		}
-		return *this;
-	}
 
 }
 

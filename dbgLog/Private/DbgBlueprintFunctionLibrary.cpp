@@ -53,25 +53,26 @@ void UDbgBlueprintFunctionLibrary::OutputLog(UObject* WorldContextObject,
 		case EDbgLogOutput::Both: LogArgs.ScreenAndConsole(); break;
 	}
 
-	if ( LogExtraArgs.bLogDateAndTime )
+	if (LogExtraArgs.bLogDateAndTime)
 	{
 	    LogArgs.LogDateAndTime();
 	}
 
-	if ( LogExtraArgs.bLogToSlateNotify )
+	if (LogExtraArgs.bLogToSlateNotify)
 	{
-		LogArgs.LogToSlateNotify( LogExtraArgs.bOnlyLogToSlateNotify );
+		LogArgs.LogToSlateNotify(LogExtraArgs.bOnlyLogToSlateNotify);
 	}
 	
-	if ( LogExtraArgs.bLogToEditorMessageLog )
+	if (LogExtraArgs.bLogToEditorMessageLog)
 	{
-		LogArgs.LogToEditorMessageLog( LogExtraArgs.bShouldShowEditorMessageLogImmediately );
+		LogArgs.LogToEditorMessageLog(LogExtraArgs.bShouldShowEditorMessageLogImmediately);
 	}
 
 	
-	DBG::Log::Log( LogExtraArgs.ScreenKey != -1 ?
+	DBG::Log::Log(LogExtraArgs.ScreenKey != -1 ?
 		LogExtraArgs.ScreenKey : FMath::Rand32(),
 		std::source_location::current(), LogArgs,
-		TEXT("{0}"), LogMessage );
+		TEXT("{0}"), LogMessage);
+	
 #endif
 }
