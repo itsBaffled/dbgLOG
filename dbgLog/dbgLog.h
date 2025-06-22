@@ -27,9 +27,6 @@
 
 #include "dbgLog.generated.h"
 
-
-
-
 #define KEEP_DBG_LOG (!UE_BUILD_SHIPPING) || (USE_LOGGING_IN_SHIPPING) 
 
 // #define DBG_API MYMODULE_API // If you would rather define the modules API here you can, but otherwise stick to using the build.cs definition.
@@ -283,6 +280,11 @@ enum EDbgLogOutput : uint8
 
 
 #if KEEP_DBG_LOG
+
+
+// This macro was added in 5.6 so in order to not clash on that version or greater I am prefixing with bf_
+#define bf_UE_VERSION_NEWER_THAN_OR_EQUAL(MajorVersion, MinorVersion, PatchVersion)\
+	UE_GREATER_SORT(ENGINE_MAJOR_VERSION, MajorVersion, UE_GREATER_SORT(ENGINE_MINOR_VERSION, MinorVersion, UE_GREATER_SORT(ENGINE_PATCH_VERSION, PatchVersion, true)))
 
 
 #ifndef DBG_API
@@ -976,7 +978,7 @@ namespace DBG::Log
 					}
 				case DbgLogArgs::EDbgVisualLogShape::Arrow:
 					{
-	#if UE_VERSION_NEWER_THAN_OR_EQUAL(5, 6, 0)
+	#if bf_UE_VERSION_NEWER_THAN_OR_EQUAL(5, 6, 0)
 						FVisualLogger::ArrowLineLogf(
 							LogArgs.VisualLoggerOwnerValue,
 							*LogCategory, LogArgs.VerbosityValue,
@@ -997,7 +999,7 @@ namespace DBG::Log
 					}
 				case DbgLogArgs::EDbgVisualLogShape::Disk:
 					{
-	#if UE_VERSION_NEWER_THAN_OR_EQUAL(5, 6, 0)
+	#if bf_UE_VERSION_NEWER_THAN_OR_EQUAL(5, 6, 0)
 						FVisualLogger::DiscLogf(
 							LogArgs.VisualLoggerOwnerValue,
 							*LogCategory, LogArgs.VerbosityValue,
