@@ -1277,18 +1277,48 @@ namespace DBG::Log
 		// This is basically UE_LOG but expanded so we dont need compile time log category stuff
 		// also allows our logs to correctly associate with the dbgLOG macros location rather
 		// than here in the function.
-		static auto OutputLog = [](const std::source_location& Loc, const FLogCategoryBase& LC,
-			ELogVerbosity::Type Verb, const FString& Msg)
+		static auto OutputLog = [](const std::source_location& Loc,
+			const FLogCategoryBase& LC, ELogVerbosity::Type Verb,
+			const FString& Msg)
 		{
 			static ::UE::Logging::Private::FStaticBasicLogDynamicData LOG_Dynamic;
-			static ::UE::Logging::Private::FStaticBasicLogRecord LOG_Static(TEXT("%s"),
-				Loc.file_name(), Loc.line(), Verb, LOG_Dynamic);
+
+#if bf_UE_VERSION_NEWER_THAN_OR_EQUAL(5, 7, 0)
+			static ::UE::Logging::Private::FStaticBasicLogRecord LOG_Static(
+				TEXT("%s"),
+				Loc.file_name(),
+				Loc.line(),
+				&LOG_Dynamic);
 			
+			LOG_Static.File = Loc.file_name();
+			LOG_Static.Line = Loc.line();
+
+			if ((Verb & ELogVerbosity::VerbosityMask) == ::ELogVerbosity::Fatal)
+			{
+				::UE::Logging::Private::BasicFatalLog(LOG_Static, &LC);
+			}
+			else if ((Verb & ::ELogVerbosity::VerbosityMask) <= ::ELogVerbosity::VeryVerbose)
+			{
+				if ((Verb & ::ELogVerbosity::VerbosityMask) <= LC.GetCompileTimeVerbosity())
+				{
+					if (!LC.IsSuppressed(Verb))
+					{
+						FMsg::Logf(Loc.file_name(), Loc.line(), LC.GetCategoryName(), Verb, TEXT("%s"), *Msg);
+					}
+				}
+			}
+#else
+			static ::UE::Logging::Private::FStaticBasicLogRecord LOG_Static(
+				TEXT("%s"),
+				Loc.file_name(),
+				Loc.line(),
+				Verb,
+				LOG_Dynamic);
+
 			LOG_Static.Verbosity = Verb;
 			LOG_Static.File = Loc.file_name();
 			LOG_Static.Line = Loc.line();
-			LOG_Static.Verbosity = Verb;
-		
+
 			if ((Verb & ELogVerbosity::VerbosityMask) == ::ELogVerbosity::Fatal)
 			{
 				::UE::Logging::Private::BasicFatalLog(LC, &LOG_Static, *Msg);
@@ -1303,6 +1333,7 @@ namespace DBG::Log
 					}
 				}
 			}
+#endif
 		};
 
 		
