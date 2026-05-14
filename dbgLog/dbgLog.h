@@ -1283,7 +1283,31 @@ namespace DBG::Log
 		{
 			static ::UE::Logging::Private::FStaticBasicLogDynamicData LOG_Dynamic;
 
-#if bf_UE_VERSION_NEWER_THAN_OR_EQUAL(5, 7, 0)
+#if bf_UE_VERSION_NEWER_THAN_OR_EQUAL(5, 8, 0)
+			static ::UE::Logging::Private::TStaticBasicLogRecord LOG_Static(
+				TEXT("%s"),
+				Loc.file_name(),
+				Loc.line(),
+				&LOG_Dynamic);
+
+			LOG_Static.File = Loc.file_name();
+			LOG_Static.Line = Loc.line();
+
+			if ((Verb & ELogVerbosity::VerbosityMask) == ::ELogVerbosity::Fatal)
+			{
+				::UE::Logging::Private::BasicFatalLog(LOG_Static, &LC);
+			}
+			else if ((Verb & ::ELogVerbosity::VerbosityMask) <= ::ELogVerbosity::VeryVerbose)
+			{
+				if ((Verb & ::ELogVerbosity::VerbosityMask) <= LC.GetCompileTimeVerbosity())
+				{
+					if (!LC.IsSuppressed(Verb))
+					{
+						FMsg::Logf(Loc.file_name(), Loc.line(), LC.GetCategoryName(), Verb, TEXT("%s"), *Msg);
+					}
+				}
+			}
+#elif bf_UE_VERSION_NEWER_THAN_OR_EQUAL(5, 7, 0)
 			static ::UE::Logging::Private::FStaticBasicLogRecord LOG_Static(
 				TEXT("%s"),
 				Loc.file_name(),
